@@ -15,3 +15,8 @@ class ThrottleMethod(Enum):
     NICE = auto()   
     CGROUPS = auto()
     PAUSE = auto()
+
+    class ProtectionLevel(Enum):
+    SAFE = auto()
+    AGGRESSIVE = auto()
+    EMERGENCY = auto()
