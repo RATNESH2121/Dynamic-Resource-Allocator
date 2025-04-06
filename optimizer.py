@@ -38,3 +38,12 @@ class ResourceOptimizer:
                 self.active_limits[pid] = method
                 logging.info(f"Set nice+10 on {proc_name} (PID:{pid})")
                 return True
+            
+              elif method == ThrottleMethod.CGROUPS:
+                cgroup_name = f"limit_{pid}"
+                subprocess.run(['cgcreate', '-g', f'cpu:/{cgroup_name}'], check=True)
+                subprocess.run(['cgset', '-r', 'cpu.cfs_quota_us=50000', cgroup_name], check=True)
+                subprocess.run(['cgclassify', '-g', f'cpu:/{cgroup_name}', str(pid)], check=True)
+                self.active_limits[pid] = method
+                logging.info(f"Set CPU limit on {proc_name} via cgroups")
+                return True
