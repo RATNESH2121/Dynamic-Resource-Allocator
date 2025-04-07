@@ -47,3 +47,26 @@ class ResourceOptimizer:
                 self.active_limits[pid] = method
                 logging.info(f"Set CPU limit on {proc_name} via cgroups")
                 return True
+            
+                 elif method == ThrottleMethod.PAUSE:
+                proc.suspend()
+                self.active_limits[pid] = method
+                logging.warning(f"Paused {proc_name} (PID:{pid})")
+                return True
+                
+        except Exception as e:
+            logging.error(f"Failed to throttle PID {pid}: {e}")
+            return False
+
+    def release_process(self, pid: int) -> bool:
+        if pid not in self.active_limits:
+            return False
+            
+        try:
+            method = self.active_limits[pid]
+            proc = psutil.Process(pid)
+            proc_name = proc.name()
+            
+            if method == ThrottleMethod.NICE:
+                os.system(f"renice 0 {pid}")
+                
