@@ -70,3 +70,18 @@ class ResourceOptimizer:
             if method == ThrottleMethod.NICE:
                 os.system(f"renice 0 {pid}")
                 
+
+                  elif method == ThrottleMethod.CGROUPS:
+                cgroup_name = f"limit_{pid}"
+                subprocess.run(['cgdelete', '-g', f'cpu:/{cgroup_name}'], check=True)
+                
+            elif method == ThrottleMethod.PAUSE:
+                proc.resume()
+                
+            del self.active_limits[pid]
+            logging.info(f"Released limits on {proc_name} (PID:{pid})")
+            return True
+            
+        except Exception as e:
+            logging.error(f"Failed to release PID {pid}: {e}")
+            return False
