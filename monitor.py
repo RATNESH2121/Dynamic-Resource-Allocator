@@ -8,3 +8,14 @@
  8|     format='%(asctime)s - %(levelname)s - %(message)s',
  9|     filename='monitor.log'
 10| )
+
+12| class SystemMonitor:
+13|     def __init__(self, refresh_rate: float = 1.0):
+14|         self.refresh_rate = refresh_rate
+15|         self._last_update = 0
+16|         self._cached_metrics = {}
+17|         self._historical_data = {
+18|             'cpu': [],
+19|             'memory': [],
+20|             'timestamp': []
+21|         }
