@@ -85,3 +85,20 @@ class ResourceOptimizer:
         except Exception as e:
             logging.error(f"Failed to release PID {pid}: {e}")
             return False
+
+# Singleton instance
+optimizer = ResourceOptimizer()
+
+def throttle_process(pid: int) -> bool:
+    return optimizer.throttle_process(pid)
+
+def release_process(pid: int) -> bool:
+    return optimizer.release_process(pid)
+
+if __name__ == '__main__':
+    import os
+    test_pid = os.getpid()
+    print(f"Throttling self (PID: {test_pid})...")
+    optimizer.throttle_process(test_pid)
+    input("Press Enter to release...")
+    optimizer.release_process(test_pid)
