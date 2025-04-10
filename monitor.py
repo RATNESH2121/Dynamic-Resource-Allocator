@@ -19,3 +19,8 @@
 19|             'memory': [],
 20|             'timestamp': []
 21|         }
+
+23|     def refresh(self):
+24|         """Update all metrics"""
+25|         self._update_system_metrics()
+26|         self._update_historical_data()
