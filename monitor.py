@@ -40,3 +40,33 @@
 40|                 'memory': -1,
 41|                 'processes': []
 42|             }
+
+44|     def _get_process_list(self) -> List[Dict]:
+45|         """Get sorted process list by CPU usage"""
+46|         processes = []
+47|         for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent', 'status']):
+48|             try:
+49|                 processes.append({
+50|                     'pid': proc.info['pid'],
+51|                     'name': proc.info['name'] or 'Unknown',
+52|                     'cpu': proc.info['cpu_percent'],
+53|                     'memory': proc.info['memory_percent'],
+54|                     'status': proc.info['status']
+55|                 })
+56|             except (psutil.NoSuchProcess, psutil.AccessDenied):
+57|                 continue
+58|         return sorted(processes, key=lambda x: x['cpu'], reverse=True)
+
+60|     def _update_historical_data(self):
+61|         """Maintain historical data"""
+62|         if not self._cached_metrics:
+63|             return
+64|         
+65|         self._historical_data['cpu'].append(self._cached_metrics['cpu'])
+66|         self._historical_data['memory'].append(self._cached_metrics['memory'])
+67|         self._historical_data['timestamp'].append(time.time())
+68|         
+69|         # Keep last 300 samples
+70|         for key in self._historical_data:
+71|             if len(self._historical_data[key]) > 300:
+72|                 self._historical_data[key].pop(0)
