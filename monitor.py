@@ -70,3 +70,10 @@
 70|         for key in self._historical_data:
 71|             if len(self._historical_data[key]) > 300:
 72|                 self._historical_data[key].pop(0)
+
+74|     def get_metrics(self) -> Dict:
+75|         """Get current metrics with cache control"""
+76|         if (time.time() - self._last_update) > self.refresh_rate:
+77|             self.refresh()
+78|             self._last_update = time.time()
+79|         return self._cached_metrics
