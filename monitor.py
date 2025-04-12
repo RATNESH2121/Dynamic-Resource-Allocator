@@ -77,3 +77,18 @@
 77|             self.refresh()
 78|             self._last_update = time.time()
 79|         return self._cached_metrics
+
+
+81|     def get_historical_data(self, metric: str = 'cpu', window: int = 60) -> Tuple[List[float], List[float]]:
+82|         """Get time-series data for visualization"""
+83|         if metric not in self._historical_data:
+84|             return [], []
+85|         
+86|         cutoff = time.time() - window
+87|         filtered = [
+88|             (t, v) for t, v in zip(
+89|                 self._historical_data['timestamp'],
+90|                 self._historical_data[metric]
+91|             ) if t >= cutoff
+92|         ]
+93|         return zip(*filtered) if filtered else ([], [])
