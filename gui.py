@@ -115,3 +115,51 @@ class Dashboard:
                         (datetime.now(), "RELEASE", proc['pid'], proc['name'])
                     )
                     st.rerun()
+                    
+  
+    def _render_history(self):
+        st.markdown("### Performance History")
+        timestamps, cpu = monitor.get_historical_data('cpu', 60)
+        _, mem = monitor.get_historical_data('memory', 60)
+        
+        if timestamps and cpu and mem:
+            df = pd.DataFrame({
+                'Time': [datetime.fromtimestamp(t) for t in timestamps],
+                'CPU %': cpu,
+                'Memory %': mem
+            })
+            st.line_chart(df.set_index('Time'))
+        
+        if st.session_state.throttle_history:
+            st.markdown("### Recent Actions")
+            action_df = pd.DataFrame(
+                st.session_state.throttle_history[-10:],
+                columns=['Time', 'Action', 'PID', 'Process']
+            )
+            st.dataframe(action_df, hide_index=True)
+    
+    def _auto_throttle(self):
+        if st.session_state.auto_throttle:
+            cpu = get_cpu_usage()
+            if cpu > 80:
+                top_proc = get_top_processes(1)[0]
+                throttle_process(top_proc['pid'])
+                st.session_state.throttle_history.append(
+                    (datetime.now(), "AUTO-THROTTLE", top_proc['pid'], top_proc['name'])
+                )
+                st.rerun()
+    
+    def render(self):
+        self._render_header()
+        self._render_system_metrics()
+        self._render_process_table()
+        self._render_history()
+        self._auto_throttle()
+        
+        if time.time() - self.last_update > self.refresh_rate:
+            self._update_metrics()
+            st.rerun()
+
+if __name__ == '__main__':
+    dashboard = Dashboard()
+    dashboard.render()
