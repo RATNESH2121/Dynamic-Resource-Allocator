@@ -92,3 +92,12 @@
 91|             ) if t >= cutoff
 92|         ]
 93|         return zip(*filtered) if filtered else ([], [])
+
+95| # Module-level functions
+96| monitor = SystemMonitor()
+98| def get_cpu_usage() -> float:
+99|     return monitor.get_metrics()['cpu']
+101| def get_memory_usage() -> float:
+102|     return monitor.get_metrics()['memory']
+104| def get_top_processes(n: int = 5) -> List[Dict]:
+105|     return monitor.get_metrics()['processes'][:n]
