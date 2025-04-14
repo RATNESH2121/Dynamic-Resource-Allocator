@@ -101,3 +101,11 @@
 102|     return monitor.get_metrics()['memory']
 104| def get_top_processes(n: int = 5) -> List[Dict]:
 105|     return monitor.get_metrics()['processes'][:n]
+
+
+107| if __name__ == '__main__':
+108|     print(f"CPU: {get_cpu_usage()}%")
+109|     print(f"Memory: {get_memory_usage()}%")
+110|     print("Top processes:")
+111|     for proc in get_top_processes(3):
+112|         print(f"{proc['name']} (PID:{proc['pid']}): {proc['cpu']}% CPU")
